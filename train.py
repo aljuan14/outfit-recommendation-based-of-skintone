@@ -1,44 +1,79 @@
-from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.applications import MobileNetV2
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.applications import MobileNetV2
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
 import os
+import shutil
+import glob
 
-# 1. Tentukan lokasi folder dataset Anda
-# Asumsi: dataset Anda memiliki struktur folder seperti ini:
-# /dataset_root/
-# ├── Light/
-# ├── Medium/
-# └── Dark/
-DATASET_PATH = 'path/to/your/kaggle/dataset'
+# --- TAHAP 0: PERSIAPAN DATASET 100 GAMBAR/KELAS ---
 
-# 2. Tentukan Hyperparameter
-IMAGE_SIZE = (224, 224)  # Ukuran standar untuk Transfer Learning
-BATCH_SIZE = 32         # Jumlah gambar yang diproses dalam satu waktu
+ORIGINAL_DATA_PATH = 'data_skintone'
+# Mengganti nama folder subset baru
+SUBSET_DATA_PATH = 'data_skintone_100'
+# Mengubah jumlah gambar per kelas
+NUM_IMAGES_PER_CLASS = 100
 
-# 3. Augmentasi dan Normalisasi Data
-# Normalisasi: Mengubah nilai piksel dari 0-255 menjadi 0-1 (rescale=1./255)
-# Augmentasi: Membuat variasi data (misalnya memutar, membalik) agar model lebih kuat (hanya untuk Training)
+print(f"Mempersiapkan dataset 100 gambar/kelas di: {SUBSET_DATA_PATH}")
 
+# Cek apakah folder data asli ada
+if not os.path.exists(ORIGINAL_DATA_PATH):
+    raise FileNotFoundError(
+        f"Folder dataset asli tidak ditemukan di {ORIGINAL_DATA_PATH}")
+
+# Dapatkan nama-nama kelas
+class_names = [d for d in os.listdir(ORIGINAL_DATA_PATH) if os.path.isdir(
+    os.path.join(ORIGINAL_DATA_PATH, d))]
+
+for class_name in class_names:
+    original_class_dir = os.path.join(ORIGINAL_DATA_PATH, class_name)
+    subset_class_dir = os.path.join(SUBSET_DATA_PATH, class_name)
+
+    # Buat folder kelas di dataset subset
+    os.makedirs(subset_class_dir, exist_ok=True)
+
+    # Temukan semua gambar (jpg, png, jpeg)
+    image_files = glob.glob(os.path.join(original_class_dir, '*.jpg')) + \
+        glob.glob(os.path.join(original_class_dir, '*.png')) + \
+        glob.glob(os.path.join(original_class_dir, '*.jpeg'))
+
+    # Ambil 100 gambar pertama
+    images_to_copy = image_files[:NUM_IMAGES_PER_CLASS]
+
+    # Salin gambar-gambar tersebut ke folder subset
+    print(f"Menyalin {len(images_to_copy)} gambar untuk kelas: {class_name}")
+    for img_path in images_to_copy:
+        shutil.copy(img_path, subset_class_dir)
+
+print("Dataset 100 gambar/kelas berhasil dibuat.")
+print("-" * 30)
+
+# --- TAHAP 1: PERSIAPAN DATA (MENGGUNAKAN DATASET 100) ---
+
+DATASET_PATH = SUBSET_DATA_PATH
+IMAGE_SIZE = (224, 224)
+# Batch size bisa sedikit lebih besar sekarang
+BATCH_SIZE = 16
+
+# Augmentasi dan Normalisasi Data
 datagen = ImageDataGenerator(
     rescale=1./255,
-    validation_split=0.2,  # Menggunakan 20% data untuk Validasi
+    # 20% validasi (20 gambar/kelas), 80% training (80 gambar/kelas)
+    validation_split=0.2,
     rotation_range=20,
     width_shift_range=0.2,
     height_shift_range=0.2,
     horizontal_flip=True
 )
 
-# 4. Memuat dan Membagi Data (Training & Validation)
-# Class_mode='categorical' karena ini adalah klasifikasi multi-kelas (Light, Medium, Dark)
-
+# Memuat Data Training & Validasi dari folder SUBSET
 train_generator = datagen.flow_from_directory(
     DATASET_PATH,
     target_size=IMAGE_SIZE,
     batch_size=BATCH_SIZE,
     class_mode='categorical',
-    subset='training'  # Data untuk pelatihan
+    subset='training'
 )
 
 validation_generator = datagen.flow_from_directory(
@@ -46,64 +81,55 @@ validation_generator = datagen.flow_from_directory(
     target_size=IMAGE_SIZE,
     batch_size=BATCH_SIZE,
     class_mode='categorical',
-    subset='validation'  # Data untuk validasi
+    subset='validation'
 )
 
-# Mengetahui urutan label kelas:
 class_labels = list(train_generator.class_indices.keys())
-print(f"Label Kelas: {class_labels}")
-# Output: ['Dark', 'Light', 'Medium'] (tergantung urutan abjad folder)
+num_classes = len(class_labels)
+print(f"Label Kelas (ditemukan {num_classes} kelas): {class_labels}")
 
+# --- TAHAP 2: PEMBANGUNAN MODEL CNN (TRANSFER LEARNING) ---
 
-# 1. Muat Model Pre-trained (MobileNetV2)
-# weights='imagenet': Menggunakan bobot yang sudah dilatih
-# include_top=False: Menghilangkan lapisan klasifikasi terakhir, karena kita akan buat yang baru
 base_model = MobileNetV2(
-    input_shape=IMAGE_SIZE + (3,),  # Ukuran input (224, 224, 3)
+    input_shape=IMAGE_SIZE + (3,),
     include_top=False,
     weights='imagenet'
 )
-
-# 2. Freeze Lapisan Dasar
-# Mencegah bobot (weights) dari MobileNetV2 berubah selama pelatihan
 base_model.trainable = False
-
-# 3. Buat Arsitektur Model Akhir (Sequential Model)
-num_classes = len(class_labels)  # Jumlah kelas: 3 (Dark, Light, Medium)
 
 model = Sequential([
     base_model,
-    GlobalAveragePooling2D(),  # Mengubah output MobileNetV2 menjadi vektor
-    Dense(128, activation='relu'),  # Lapisan tersembunyi
-    Dense(num_classes, activation='softmax')  # Lapisan Output
+    GlobalAveragePooling2D(),
+    Dense(128, activation='relu'),
+    Dense(num_classes, activation='softmax')
 ])
 
-# 4. Kompilasi Model
 model.compile(
     optimizer='adam',
-    # Fungsi loss standar untuk klasifikasi multi-kelas
     loss='categorical_crossentropy',
     metrics=['accuracy']
 )
 
-# Tampilkan ringkasan model
 model.summary()
 
-# 1. Pelatihan Model
-# Training akan memakan waktu tergantung spesifikasi komputer/GPU Anda
+# --- TAHAP 3: PELATIHAN DAN EVALUASI ---
+
+# Kita bisa tambah epoch sedikit karena data lebih banyak
+EPOCHS = 10
+
+print(f"Memulai pelatihan model dengan {EPOCHS} epoch...")
+
 history = model.fit(
     train_generator,
-    steps_per_epoch=train_generator.samples // BATCH_SIZE,
     validation_data=validation_generator,
-    validation_steps=validation_generator.samples // BATCH_SIZE,
-    epochs=10  # Mulai dengan 10 epoch, bisa disesuaikan
+    epochs=EPOCHS
 )
 
-# 2. Evaluasi Final (Opsional, tapi Direkomendasikan)
-# Gunakan data test terpisah jika Anda memilikinya, atau generator validasi
+print("Evaluasi model pada data validasi...")
 loss, accuracy = model.evaluate(validation_generator)
 print(f"Akurasi Model pada data validasi: {accuracy*100:.2f}%")
 
-# 3. Simpan Model
-model.save('skin_tone_classifier.h5')
-print("Model berhasil disimpan sebagai skin_tone_classifier.h5")
+# Simpan model dengan nama baru
+model_filename = 'skin_tone_classifier_100.h5'
+model.save(model_filename)
+print(f"Model uji coba berhasil disimpan sebagai {model_filename}")

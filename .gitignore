@@ -3,6 +3,8 @@
 
 # 2. Abaikan Folder Dataset
 data_skintone/
+data_skintone_small/
+data_skintone_100/
 
 # 3. Abaikan File Umum Python
 __pycache__/
