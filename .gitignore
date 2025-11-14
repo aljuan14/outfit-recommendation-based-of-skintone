@@ -1,0 +1,19 @@
+# 1. Abaikan Virtual Environment
+.venv/
+
+# 2. Abaikan Folder Dataset
+data_skintone/
+
+# 3. Abaikan File Umum Python
+__pycache__/
+*.pyc
+
+# 4. Abaikan File Model (Opsional, tapi direkomendasikan)
+# Model yang dilatih biasanya berukuran besar
+*.h5
+*.keras
+*.pb
+
+# 5. Abaikan File Sistem Operasi
+.DS_Store
+Thumbs.db
