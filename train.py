@@ -2,72 +2,36 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications import MobileNetV2
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
+from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Dropout  # Impor Dropout
 import os
-import shutil
-import glob
 
-# --- TAHAP 0: PERSIAPAN DATASET 100 GAMBAR/KELAS ---
+# --- TAHAP 1: PERSIAPAN DATA (MENGGUNAKAN SEMUA DATA) ---
 
-ORIGINAL_DATA_PATH = 'data_skintone'
-# Mengganti nama folder subset baru
-SUBSET_DATA_PATH = 'data_skintone_100'
-# Mengubah jumlah gambar per kelas
-NUM_IMAGES_PER_CLASS = 100
-
-print(f"Mempersiapkan dataset 100 gambar/kelas di: {SUBSET_DATA_PATH}")
+# Langsung arahkan ke folder dataset LENGKAP Anda
+DATASET_PATH = 'data_skintone'
 
 # Cek apakah folder data asli ada
-if not os.path.exists(ORIGINAL_DATA_PATH):
+if not os.path.exists(DATASET_PATH):
     raise FileNotFoundError(
-        f"Folder dataset asli tidak ditemukan di {ORIGINAL_DATA_PATH}")
+        f"Folder dataset lengkap tidak ditemukan di {DATASET_PATH}")
 
-# Dapatkan nama-nama kelas
-class_names = [d for d in os.listdir(ORIGINAL_DATA_PATH) if os.path.isdir(
-    os.path.join(ORIGINAL_DATA_PATH, d))]
-
-for class_name in class_names:
-    original_class_dir = os.path.join(ORIGINAL_DATA_PATH, class_name)
-    subset_class_dir = os.path.join(SUBSET_DATA_PATH, class_name)
-
-    # Buat folder kelas di dataset subset
-    os.makedirs(subset_class_dir, exist_ok=True)
-
-    # Temukan semua gambar (jpg, png, jpeg)
-    image_files = glob.glob(os.path.join(original_class_dir, '*.jpg')) + \
-        glob.glob(os.path.join(original_class_dir, '*.png')) + \
-        glob.glob(os.path.join(original_class_dir, '*.jpeg'))
-
-    # Ambil 100 gambar pertama
-    images_to_copy = image_files[:NUM_IMAGES_PER_CLASS]
-
-    # Salin gambar-gambar tersebut ke folder subset
-    print(f"Menyalin {len(images_to_copy)} gambar untuk kelas: {class_name}")
-    for img_path in images_to_copy:
-        shutil.copy(img_path, subset_class_dir)
-
-print("Dataset 100 gambar/kelas berhasil dibuat.")
-print("-" * 30)
-
-# --- TAHAP 1: PERSIAPAN DATA (MENGGUNAKAN DATASET 100) ---
-
-DATASET_PATH = SUBSET_DATA_PATH
 IMAGE_SIZE = (224, 224)
-# Batch size bisa sedikit lebih besar sekarang
-BATCH_SIZE = 16
+# Batch size yang lebih standar untuk dataset besar
+BATCH_SIZE = 32
+
+print(f"Memuat dataset lengkap dari: {DATASET_PATH}")
 
 # Augmentasi dan Normalisasi Data
 datagen = ImageDataGenerator(
     rescale=1./255,
-    # 20% validasi (20 gambar/kelas), 80% training (80 gambar/kelas)
-    validation_split=0.2,
+    validation_split=0.2,  # 20% validasi, 80% training
     rotation_range=20,
     width_shift_range=0.2,
     height_shift_range=0.2,
     horizontal_flip=True
 )
 
-# Memuat Data Training & Validasi dari folder SUBSET
+# Memuat Data Training & Validasi dari folder LENGKAP
 train_generator = datagen.flow_from_directory(
     DATASET_PATH,
     target_size=IMAGE_SIZE,
@@ -88,7 +52,7 @@ class_labels = list(train_generator.class_indices.keys())
 num_classes = len(class_labels)
 print(f"Label Kelas (ditemukan {num_classes} kelas): {class_labels}")
 
-# --- TAHAP 2: PEMBANGUNAN MODEL CNN (TRANSFER LEARNING) ---
+# --- TAHAP 2: PEMBANGUNAN MODEL CNN (DENGAN DROPOUT) ---
 
 base_model = MobileNetV2(
     input_shape=IMAGE_SIZE + (3,),
@@ -101,6 +65,7 @@ model = Sequential([
     base_model,
     GlobalAveragePooling2D(),
     Dense(128, activation='relu'),
+    Dropout(0.5),  # TAMBAHKAN LAPISAN DROPOUT UNTUK ANTI-OVERFITTING
     Dense(num_classes, activation='softmax')
 ])
 
@@ -114,10 +79,10 @@ model.summary()
 
 # --- TAHAP 3: PELATIHAN DAN EVALUASI ---
 
-# Kita bisa tambah epoch sedikit karena data lebih banyak
-EPOCHS = 10
+# Latih lebih lama karena datanya jauh lebih banyak
+EPOCHS = 20
 
-print(f"Memulai pelatihan model dengan {EPOCHS} epoch...")
+print(f"Memulai pelatihan model FINAL dengan {EPOCHS} epoch...")
 
 history = model.fit(
     train_generator,
@@ -125,11 +90,12 @@ history = model.fit(
     epochs=EPOCHS
 )
 
-print("Evaluasi model pada data validasi...")
+print("Evaluasi model final pada data validasi...")
 loss, accuracy = model.evaluate(validation_generator)
-print(f"Akurasi Model pada data validasi: {accuracy*100:.2f}%")
+print(f"Akurasi Model FINAL pada data validasi: {accuracy*100:.2f}%")
 
-# Simpan model dengan nama baru
-model_filename = 'skin_tone_classifier_100.h5'
+# Simpan model final
+model_filename = 'skin_tone_classifier_final.h5'
+# (Ganti .h5 menjadi .keras jika Anda ingin menggunakan format baru)
 model.save(model_filename)
-print(f"Model uji coba berhasil disimpan sebagai {model_filename}")
+print(f"Model FINAL berhasil disimpan sebagai {model_filename}")
