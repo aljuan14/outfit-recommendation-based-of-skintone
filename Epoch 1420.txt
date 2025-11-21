@@ -1,0 +1,127 @@
+Epoch 14/20
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 546ms/step - accuracy: 0.7657 - loss: 0.5372   
+Epoch 14: val_accuracy improved from 0.69179 to 0.69598, saving model to best_model_initial.keras
+896/896 ━━━━━━━━━━━━━━━━━━━━ 611s 681ms/step - accuracy: 0.7636 - loss: 0.5403 - val_accuracy: 0.6960 - val_loss: 0.6959 - learning_rate: 5.0000e-04
+Epoch 15/20
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 546ms/step - accuracy: 0.7709 - loss: 0.5326  
+Epoch 15: val_accuracy did not improve from 0.69598
+896/896 ━━━━━━━━━━━━━━━━━━━━ 612s 684ms/step - accuracy: 0.7666 - loss: 0.5347 - val_accuracy: 0.6833 - val_loss: 0.7235 - learning_rate: 5.0000e-04
+Epoch 16/20
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 552ms/step - accuracy: 0.7737 - loss: 0.5256   
+Epoch 16: val_accuracy did not improve from 0.69598
+896/896 ━━━━━━━━━━━━━━━━━━━━ 616s 688ms/step - accuracy: 0.7704 - loss: 0.5300 - val_accuracy: 0.6693 - val_loss: 0.7613 - learning_rate: 5.0000e-04
+Epoch 17/20
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 545ms/step - accuracy: 0.7683 - loss: 0.5321   
+Epoch 17: val_accuracy did not improve from 0.69598
+
+Epoch 17: ReduceLROnPlateau reducing learning rate to 0.0002500000118743628.
+896/896 ━━━━━━━━━━━━━━━━━━━━ 610s 681ms/step - accuracy: 0.7715 - loss: 0.5285 - val_accuracy: 0.6870 - val_loss: 0.7321 - learning_rate: 5.0000e-04
+Epoch 18/20
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 545ms/step - accuracy: 0.7776 - loss: 0.5180   
+Epoch 18: val_accuracy did not improve from 0.69598
+896/896 ━━━━━━━━━━━━━━━━━━━━ 608s 679ms/step - accuracy: 0.7773 - loss: 0.5154 - val_accuracy: 0.6954 - val_loss: 0.7084 - learning_rate: 2.5000e-04
+Epoch 19/20
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 546ms/step - accuracy: 0.7840 - loss: 0.5055   
+Epoch 19: val_accuracy improved from 0.69598 to 0.70631, saving model to best_model_initial.keras
+896/896 ━━━━━━━━━━━━━━━━━━━━ 611s 682ms/step - accuracy: 0.7814 - loss: 0.5072 - val_accuracy: 0.7063 - val_loss: 0.7003 - learning_rate: 2.5000e-04
+Epoch 19: early stopping
+Restoring model weights from the end of the best epoch: 14.
+
+============================================================
+TAHAP 4: FINE-TUNING (UNFREEZE BEBERAPA LAYER)
+============================================================
+✓ Layer yang di-unfreeze: 30
+
+Memulai fine-tuning dengan 10 epochs maksimal...
+Epoch 1/10
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 624ms/step - accuracy: 0.6631 - loss: 0.8793  
+Epoch 1: val_accuracy improved from None to 0.66792, saving model to best_model_finetuned.keras
+896/896 ━━━━━━━━━━━━━━━━━━━━ 687s 762ms/step - accuracy: 0.6960 - loss: 0.7442 - val_accuracy: 0.6679 - val_loss: 0.8307 - learning_rate: 1.0000e-05
+Epoch 2/10
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 624ms/step - accuracy: 0.7285 - loss: 0.6014   
+Epoch 2: val_accuracy improved from 0.66792 to 0.68160, saving model to best_model_finetuned.keras
+896/896 ━━━━━━━━━━━━━━━━━━━━ 681s 760ms/step - accuracy: 0.7404 - loss: 0.5816 - val_accuracy: 0.6816 - val_loss: 0.7987 - learning_rate: 1.0000e-05
+Epoch 3/10
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 623ms/step - accuracy: 0.7608 - loss: 0.5394   
+Epoch 3: val_accuracy improved from 0.68160 to 0.71231, saving model to best_model_finetuned.keras
+896/896 ━━━━━━━━━━━━━━━━━━━━ 681s 760ms/step - accuracy: 0.7676 - loss: 0.5303 - val_accuracy: 0.7123 - val_loss: 0.6841 - learning_rate: 1.0000e-05
+Epoch 4/10
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 623ms/step - accuracy: 0.7853 - loss: 0.4955   
+Epoch 4: val_accuracy improved from 0.71231 to 0.72208, saving model to best_model_finetuned.keras
+896/896 ━━━━━━━━━━━━━━━━━━━━ 680s 759ms/step - accuracy: 0.7877 - loss: 0.4923 - val_accuracy: 0.7221 - val_loss: 0.6628 - learning_rate: 1.0000e-05
+Epoch 5/10
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 623ms/step - accuracy: 0.8011 - loss: 0.4707   
+Epoch 5: val_accuracy did not improve from 0.72208
+896/896 ━━━━━━━━━━━━━━━━━━━━ 680s 759ms/step - accuracy: 0.8011 - loss: 0.4647 - val_accuracy: 0.7083 - val_loss: 0.6941 - learning_rate: 1.0000e-05
+Epoch 6/10
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 624ms/step - accuracy: 0.8114 - loss: 0.4441   
+Epoch 6: val_accuracy did not improve from 0.72208
+896/896 ━━━━━━━━━━━━━━━━━━━━ 681s 760ms/step - accuracy: 0.8107 - loss: 0.4443 - val_accuracy: 0.6942 - val_loss: 0.7570 - learning_rate: 1.0000e-05
+Epoch 7/10
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 625ms/step - accuracy: 0.8195 - loss: 0.4276   
+Epoch 7: val_accuracy improved from 0.72208 to 0.76117, saving model to best_model_finetuned.keras
+896/896 ━━━━━━━━━━━━━━━━━━━━ 686s 766ms/step - accuracy: 0.8195 - loss: 0.4251 - val_accuracy: 0.7612 - val_loss: 0.5440 - learning_rate: 1.0000e-05
+Epoch 8/10
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 631ms/step - accuracy: 0.8320 - loss: 0.4024   
+Epoch 8: val_accuracy did not improve from 0.76117
+896/896 ━━━━━━━━━━━━━━━━━━━━ 689s 769ms/step - accuracy: 0.8332 - loss: 0.4005 - val_accuracy: 0.7275 - val_loss: 0.6377 - learning_rate: 1.0000e-05
+Epoch 9/10
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 622ms/step - accuracy: 0.8338 - loss: 0.3927   
+Epoch 9: val_accuracy did not improve from 0.76117
+896/896 ━━━━━━━━━━━━━━━━━━━━ 679s 758ms/step - accuracy: 0.8358 - loss: 0.3913 - val_accuracy: 0.7479 - val_loss: 0.5870 - learning_rate: 1.0000e-05
+Epoch 10/10
+896/896 ━━━━━━━━━━━━━━━━━━━━ 0s 622ms/step - accuracy: 0.8333 - loss: 0.3857   
+Epoch 10: val_accuracy did not improve from 0.76117
+
+Epoch 10: ReduceLROnPlateau reducing learning rate to 4.999999873689376e-06.
+896/896 ━━━━━━━━━━━━━━━━━━━━ 679s 758ms/step - accuracy: 0.8343 - loss: 0.3853 - val_accuracy: 0.7468 - val_loss: 0.5725 - learning_rate: 1.0000e-05
+Restoring model weights from the end of the best epoch: 7.
+
+============================================================
+TAHAP 5: EVALUASI MODEL
+============================================================
+224/224 ━━━━━━━━━━━━━━━━━━━━ 123s 548ms/step - accuracy: 0.7603 - loss: 0.5552
+
+✓ Loss: 0.5552
+✓ Accuracy: 76.03%
+
+Membuat prediksi untuk evaluasi detail...
+224/224 ━━━━━━━━━━━━━━━━━━━━ 126s 558ms/step
+
+============================================================
+CLASSIFICATION REPORT
+============================================================
+              precision    recall  f1-score   support
+
+        dark       0.95      0.96      0.96      1728
+       light       0.84      0.78      0.81      1953
+    mid-dark       0.92      0.57      0.70      2115
+   mid-light       0.44      0.75      0.56      1368
+
+    accuracy                           0.76      7164
+   macro avg       0.79      0.76      0.76      7164
+weighted avg       0.82      0.76      0.77      7164
+
+
+============================================================
+TAHAP 6: MEMBUAT VISUALISASI
+============================================================
+✓ Training history disimpan: training_history.png
+✓ Confusion matrix disimpan: confusion_matrix.png
+✓ Per-class accuracy disimpan: per_class_accuracy.png
+
+============================================================
+TAHAP 7: MENYIMPAN MODEL FINAL
+============================================================
+✓ Model final disimpan: skin_tone_classifier_final.keras
+✓ Class labels disimpan: class_labels.json
+Traceback (most recent call last):
+  File "C:\Users\alfit\Documents\Duty Script\Data Sorcerers\skintone outfit\train.py", line 361, in <module>
+    model.summary(print_fn=lambda x: f.write(x + '\n'))
+  File "C:\Users\alfit\Documents\Duty Script\Data Sorcerers\skintone outfit\.venv\lib\site-packages\keras\src\utils\traceback_utils.py", line 122, in error_handler        
+    raise e.with_traceback(filtered_tb) from None
+  File "C:\Users\alfit\Documents\Duty Script\Data Sorcerers\skintone outfit\train.py", line 361, in <lambda>
+    model.summary(print_fn=lambda x: f.write(x + '\n'))
+  File "C:\Users\alfit\AppData\Local\Programs\Python\Python310\lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 21-108: character maps to <undefined>
